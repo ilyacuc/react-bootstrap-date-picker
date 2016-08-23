@@ -73,7 +73,8 @@ const Calendar = React.createClass({
 		const year = this.props.displayDate.getFullYear();
 		const month = this.props.displayDate.getMonth();
 		const firstDay = new Date(year, month, 1);
-		const startingDay = firstDay.getDay();
+		let startingDay = firstDay.getDay() - 1;
+		if(startingDay === -1) startingDay = 6;
 		let monthLength = daysInMonth[month];
 		if(month == 1) {
 			if((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
@@ -147,7 +148,7 @@ export default React.createClass({
 	},
 	getDefaultProps() {
 		const language = typeof window !== "undefined" && window.navigator ? (window.navigator.userLanguage || window.navigator.language || '').toLowerCase() : '';
-		const dateFormat = !language || language === "en-us" ? 'MM/DD/YYYY' : 'DD/MM/YYYY';
+		const dateFormat = !language || language === "ru" ? 'DD.MM.YYYY' : 'DD/MM/YYYY';
 		return {
 			cellPadding: "5px",
 			dayLabels: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
