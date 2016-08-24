@@ -6,7 +6,7 @@ import FormControl from 'react-bootstrap/lib/FormControl';
 import InputGroup from 'react-bootstrap/lib/InputGroup';
 import Popover from 'react-bootstrap/lib/Popover';
 import Button from 'react-bootstrap/lib/Button';
-import Overlay from 'react-bootstrap/lib/Overlay';
+import Overlay from 'react-bootstrap/lib/Overlay'
 
 const CalendarHeader = React.createClass({
 	displayName: "DatePickerHeader",
@@ -89,10 +89,7 @@ const Calendar = React.createClass({
 				if(day <= monthLength && (i > 0 || j >= startingDay)) {
 					const selected = day === selectedDay && month == selectedMonth && year === selectedYear;
 					const current = day === currentDay && month == currentMonth && year === currentYear;
-					week.push(<td key={j} onClick={this.handleClick.bind(this, day)} style={{
-						cursor: "pointer",
-						padding: this.props.cellPadding
-					}} className={selected ? "bg-primary" : current ? "text-muted" : null}>{day}</td>);
+					week.push(<td key={j} onClick={this.handleClick.bind(this, day)}  className={"dp-calendar__day"+ (selected ? " day--selected" : current ? " day-current" : "")}>{day}</td>);
 					day++;
 				}
 				else {
@@ -104,11 +101,11 @@ const Calendar = React.createClass({
 				break;
 			}
 		}
-		return <table className="text-center">
+		return <table className="text-center dp-calendar">
 			<thead>
 			<tr>
 				{this.props.dayLabels.map((label, index)=> {
-					return <td key={index} className="text-muted" style={{padding: this.props.cellPadding}}>
+					return <td key={index} className="text-muted">
 						<small>{label}</small>
 					</td>
 				})}
@@ -125,7 +122,6 @@ export default React.createClass({
 	displayName: "DatePicker",
 	propTypes: {
 		value: React.PropTypes.string,
-		cellPadding: React.PropTypes.string,
 		placeholder: React.PropTypes.string,
 		dayLabels: React.PropTypes.array,
 		monthLabels: React.PropTypes.array,
@@ -150,11 +146,10 @@ export default React.createClass({
 		const language = typeof window !== "undefined" && window.navigator ? (window.navigator.userLanguage || window.navigator.language || '').toLowerCase() : '';
 		const dateFormat = !language || language === "ru" ? 'DD.MM.YYYY' : 'DD/MM/YYYY';
 		return {
-			cellPadding: "5px",
 			dayLabels: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
 			monthLabels: [
 				'Январь', 'Февраль', 'Март', 'Апрель',
-				'Май', 'Июня', 'Июля', 'Август', 'Сентябрь',
+				'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь',
 				'Октябрь', 'Ноябрь', 'Декабрь'
 			],
 			clearButtonElement: "×",
@@ -425,7 +420,7 @@ export default React.createClass({
 		return <InputGroup ref="inputGroup" bsClass={this.props.bsClass} bsSize={this.props.bsSize} id={this.props.id ? this.props.id + "_group" : null}>
 			<Overlay rootClose={true} onHide={this.handleHide} show={this.state.focused} container={() => ReactDOM.findDOMNode(this.refs.overlayContainer)} target={() => ReactDOM.findDOMNode(this.refs.input)} placement={this.props.calendarPlacement} delayHide={200}>
 				<Popover id="calendar" title={calendarHeader}>
-					<Calendar cellPadding={this.props.cellPadding} selectedDate={this.state.selectedDate} displayDate={this.state.displayDate} onChange={this.onChangeDate} dayLabels={this.props.dayLabels}/>
+					<Calendar selectedDate={this.state.selectedDate} displayDate={this.state.displayDate} onChange={this.onChangeDate} dayLabels={this.props.dayLabels}/>
 				</Popover>
 			</Overlay>
 			<div ref="overlayContainer"/>
