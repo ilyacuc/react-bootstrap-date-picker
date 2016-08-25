@@ -18,6 +18,10 @@ module.exports = {
         exclude: /node_modules/,
         loader: 'babel-loader',
         test: /\.jsx?$/
+      },
+      {
+        test: /\.scss?$|\.css/,
+        loader: 'style!css!sass'
       }
     ]
   },

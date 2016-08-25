@@ -1,0 +1,38 @@
+$brand-primary: darken(#428bca, 6.5%);
+$selected-color: #e0e0e0;
+@mixin button() {
+  border-radius: 4px;
+  cursor: pointer;
+  &:hover {
+	background-color: $selected-color;
+  }
+}
+
+.dp-calendar {
+  .dp-calendar__day {
+	padding: 5px;
+	@include button();
+  }
+  .day--selected {
+	background-color: $brand-primary;
+	color: #fff;
+	&:hover {
+	  background-color: darken($brand-primary, 7%);
+	}
+  }
+  .day-current {
+	background-color: lighten($selected-color, 5%);
+  }
+}
+
+.dp-clear-button {
+  @include button();
+  text-align: center;
+  padding: 0.3em 0;
+}
+
+.dp-header {
+  .dp-header--nav-button {
+	@include button();
+  }
+}

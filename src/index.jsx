@@ -1,11 +1,11 @@
 // See http://jszen.blogspot.com/2007/03/how-to-build-simple-calendar-with.html for calendar logic.
+require('./style.scss');
 
 import React from 'react';
 import ReactDOM from 'react-dom';
 import FormControl from 'react-bootstrap/lib/FormControl';
 import InputGroup from 'react-bootstrap/lib/InputGroup';
 import Popover from 'react-bootstrap/lib/Popover';
-import Button from 'react-bootstrap/lib/Button';
 import Overlay from 'react-bootstrap/lib/Overlay'
 
 const CalendarHeader = React.createClass({
@@ -13,15 +13,7 @@ const CalendarHeader = React.createClass({
 	propTypes: {
 		displayDate: React.PropTypes.object.isRequired,
 		onChange: React.PropTypes.func.isRequired,
-		monthLabels: React.PropTypes.array.isRequired,
-		previousButtonElement: React.PropTypes.oneOfType([
-			React.PropTypes.string,
-			React.PropTypes.object
-		]).isRequired,
-		nextButtonElement: React.PropTypes.oneOfType([
-			React.PropTypes.string,
-			React.PropTypes.object
-		]).isRequired
+		monthLabels: React.PropTypes.array.isRequired
 	},
 	handleClickPrevious(){
 		const newDisplayDate = new Date(this.props.displayDate);
@@ -34,10 +26,10 @@ const CalendarHeader = React.createClass({
 		this.props.onChange(newDisplayDate);
 	},
 	render() {
-		return <div className="text-center">
-			<div className="text-muted pull-left" onClick={this.handleClickPrevious} style={{cursor: "pointer"}}>{this.props.previousButtonElement}</div>
+		return <div className="text-center dp-header">
+			<div className="text-muted pull-left dp-header--nav-button" onClick={this.handleClickPrevious}>«</div>
 			<span>{this.props.monthLabels[this.props.displayDate.getMonth()]} {this.props.displayDate.getFullYear()}</span>
-			<div className="text-muted pull-right" onClick={this.handleClickNext} style={{cursor: "pointer"}}>{this.props.nextButtonElement}</div>
+			<div className="text-muted pull-right dp-header--nav-button" onClick={this.handleClickNext}>»</div>
 		</div>;
 	}
 });
@@ -50,8 +42,7 @@ const Calendar = React.createClass({
 		selectedDate: React.PropTypes.object,
 		displayDate: React.PropTypes.object.isRequired,
 		onChange: React.PropTypes.func.isRequired,
-		dayLabels: React.PropTypes.array.isRequired,
-		cellPadding: React.PropTypes.string.isRequired
+		dayLabels: React.PropTypes.array.isRequired
 	},
 	handleClick(day) {
 		const newSelectedDate = new Date(this.props.displayDate);
@@ -89,7 +80,8 @@ const Calendar = React.createClass({
 				if(day <= monthLength && (i > 0 || j >= startingDay)) {
 					const selected = day === selectedDay && month == selectedMonth && year === selectedYear;
 					const current = day === currentDay && month == currentMonth && year === currentYear;
-					week.push(<td key={j} onClick={this.handleClick.bind(this, day)}  className={"dp-calendar__day"+ (selected ? " day--selected" : current ? " day-current" : "")}>{day}</td>);
+					week.push(
+						<td key={j} onClick={this.handleClick.bind(this, day)} className={"dp-calendar__day" + (selected ? " day--selected" : current ? " day-current" : "")}>{day}</td>);
 					day++;
 				}
 				else {
@@ -127,24 +119,12 @@ export default React.createClass({
 		monthLabels: React.PropTypes.array,
 		onChange: React.PropTypes.func,
 		onClear: React.PropTypes.func,
-		clearButtonElement: React.PropTypes.oneOfType([
-			React.PropTypes.string,
-			React.PropTypes.object
-		]),
-		previousButtonElement: React.PropTypes.oneOfType([
-			React.PropTypes.string,
-			React.PropTypes.object
-		]),
-		nextButtonElement: React.PropTypes.oneOfType([
-			React.PropTypes.string,
-			React.PropTypes.object
-		]),
 		calendarPlacement: React.PropTypes.string,
-		dateFormat: React.PropTypes.string  // 'MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY/MM/DD', 'DD-MM-YYYY'
+		dateFormat: React.PropTypes.string,  // 'MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY/MM/DD', 'DD-MM-YYYY'
+		showClearButton: React.PropTypes.bool
 	},
 	getDefaultProps() {
 		const language = typeof window !== "undefined" && window.navigator ? (window.navigator.userLanguage || window.navigator.language || '').toLowerCase() : '';
-		const dateFormat = !language || language === "ru" ? 'DD.MM.YYYY' : 'DD/MM/YYYY';
 		return {
 			dayLabels: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
 			monthLabels: [
@@ -152,11 +132,9 @@ export default React.createClass({
 				'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь',
 				'Октябрь', 'Ноябрь', 'Декабрь'
 			],
-			clearButtonElement: "×",
-			previousButtonElement: "<",
-			nextButtonElement: ">",
 			calendarPlacement: "bottom",
-			dateFormat: dateFormat
+			dateFormat: 'DD.MM.YYYY',
+			showClearButton: true
 		}
 	},
 	getInitialState() {
@@ -296,27 +274,28 @@ export default React.createClass({
 	},
 	handleInputChange(e){
 		const originalValue = ReactDOM.findDOMNode(this.refs.input).value;
+		if(!originalValue) this.clear();
 		let inputValue = originalValue.replace(/(-|\/\/)/g, this.state.separator);
 		let month, day, year;
-		if(this.props.dateFormat.match(/MM.DD.YYYY/)) {
-			if(!inputValue.match(/[0-1][0-9]\/[0-3][0-9]\/[1-2][0-9][0-9][0-9]/)) {
+		if(this.props.dateFormat.match(/DD.MM.YYYY/)) {
+			if(!inputValue.match(/[0-1][0-9]\.[0-3][0-9]\.[1-2][0-9][0-9][0-9]/)) {
 				return this.handleBadInput(originalValue);
 			}
-			month = inputValue.slice(0, 2).replace(/[^0-9]/g, '');
-			day = inputValue.slice(3, 5).replace(/[^0-9]/g, '');
+			day = inputValue.slice(0, 2).replace(/[^0-9]/g, '');
+			month = inputValue.slice(3, 5).replace(/[^0-9]/g, '');
 			year = inputValue.slice(6, 10).replace(/[^0-9]/g, '');
 		}
 		else
-			if(this.props.dateFormat.match(/DD.MM.YYYY/)) {
-				if(!inputValue.match(/[0-1][0-9]\/[0-3][0-9]\/[1-2][0-9][0-9][0-9]/)) {
+			if(this.props.dateFormat.match(/MM.DD.YYYY/)) {
+				if(!inputValue.match(/[0-1][0-9]\.[0-3][0-9]\.[1-2][0-9][0-9][0-9]/)) {
 					return this.handleBadInput(originalValue);
 				}
-				day = inputValue.slice(0, 2).replace(/[^0-9]/g, '');
-				month = inputValue.slice(3, 5).replace(/[^0-9]/g, '');
+				month = inputValue.slice(0, 2).replace(/[^0-9]/g, '');
+				day = inputValue.slice(3, 5).replace(/[^0-9]/g, '');
 				year = inputValue.slice(6, 10).replace(/[^0-9]/g, '');
 			}
 			else {
-				if(!inputValue.match(/[1-2][0-9][0-9][0-9]\/[0-3][0-9]\/[0-9][0-9]/)) {
+				if(!inputValue.match(/[1-2][0-9][0-9][0-9]\.[0-3][0-9]\.[0-9][0-9]/)) {
 					return this.handleBadInput(originalValue);
 				}
 				year = inputValue.slice(0, 4).replace(/[^0-9]/g, '');
@@ -326,6 +305,7 @@ export default React.createClass({
 		const monthInteger = parseInt(month, 10);
 		const dayInteger = parseInt(day, 10);
 		const yearInteger = parseInt(year, 10);
+
 		if(monthInteger > 12 || dayInteger > 31) {
 			return this.handleBadInput(originalValue);
 		}
@@ -411,8 +391,6 @@ export default React.createClass({
 	},
 	render() {
 		const calendarHeader = <CalendarHeader
-			previousButtonElement={this.props.previousButtonElement}
-			nextButtonElement={this.props.nextButtonElement}
 			displayDate={this.state.displayDate}
 			onChange={this.onChangeMonth}
 			monthLabels={this.props.monthLabels}
@@ -421,6 +399,10 @@ export default React.createClass({
 			<Overlay rootClose={true} onHide={this.handleHide} show={this.state.focused} container={() => ReactDOM.findDOMNode(this.refs.overlayContainer)} target={() => ReactDOM.findDOMNode(this.refs.input)} placement={this.props.calendarPlacement} delayHide={200}>
 				<Popover id="calendar" title={calendarHeader}>
 					<Calendar selectedDate={this.state.selectedDate} displayDate={this.state.displayDate} onChange={this.onChangeDate} dayLabels={this.props.dayLabels}/>
+					{this.props.showClearButton ?
+						<div>
+							<div onClick={this.clear} className="dp-clear-button">Очистить</div>
+						</div> : null}
 				</Popover>
 			</Overlay>
 			<div ref="overlayContainer"/>

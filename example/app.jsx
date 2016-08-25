@@ -24,6 +24,7 @@ const App = React.createClass({
     };
   },
   handleChange(value) {
+    console.log(value);
     this.setState({
       date: value
     });
