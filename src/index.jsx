@@ -1,5 +1,5 @@
 // See http://jszen.blogspot.com/2007/03/how-to-build-simple-calendar-with.html for calendar logic.
-require('./style.scss');
+require('../src/style.scss');
 
 import React from 'react';
 import ReactDOM from 'react-dom';
