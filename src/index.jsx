@@ -4,114 +4,16 @@ require('../src/style.scss');
 import React from 'react';
 import ReactDOM from 'react-dom';
 import FormControl from 'react-bootstrap/lib/FormControl';
-import InputGroup from 'react-bootstrap/lib/InputGroup';
 import Popover from 'react-bootstrap/lib/Popover';
 import Overlay from 'react-bootstrap/lib/Overlay'
+import CalendarHeader from './CalendarHeader.jsx';
+import CalendarDays from './CalendarDays.jsx';
+import CalendarMonths from './CalendarMonths.jsx';
+import CalendarYears from './CalendarYears.jsx';
 
-const CalendarHeader = React.createClass({
-	displayName: "DatePickerHeader",
-	propTypes: {
-		displayDate: React.PropTypes.object.isRequired,
-		onChange: React.PropTypes.func.isRequired,
-		monthLabels: React.PropTypes.array.isRequired
-	},
-	handleClickPrevious(){
-		const newDisplayDate = new Date(this.props.displayDate);
-		newDisplayDate.setMonth(newDisplayDate.getMonth() - 1);
-		this.props.onChange(newDisplayDate);
-	},
-	handleClickNext(){
-		const newDisplayDate = new Date(this.props.displayDate);
-		newDisplayDate.setMonth(newDisplayDate.getMonth() + 1);
-		this.props.onChange(newDisplayDate);
-	},
-	render() {
-		return <div className="text-center dp-header">
-			<div className="text-muted pull-left dp-header--nav-button" onClick={this.handleClickPrevious}>«</div>
-			<span>{this.props.monthLabels[this.props.displayDate.getMonth()]} {this.props.displayDate.getFullYear()}</span>
-			<div className="text-muted pull-right dp-header--nav-button" onClick={this.handleClickNext}>»</div>
-		</div>;
-	}
-});
 
-const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-
-const Calendar = React.createClass({
-	displayName: "DatePickerCalendar",
-	propTypes: {
-		selectedDate: React.PropTypes.object,
-		displayDate: React.PropTypes.object.isRequired,
-		onChange: React.PropTypes.func.isRequired,
-		dayLabels: React.PropTypes.array.isRequired
-	},
-	handleClick(day) {
-		const newSelectedDate = new Date(this.props.displayDate);
-		newSelectedDate.setHours(12);
-		newSelectedDate.setMinutes(0);
-		newSelectedDate.setSeconds(0);
-		newSelectedDate.setMilliseconds(0);
-		newSelectedDate.setDate(day);
-		this.props.onChange(newSelectedDate);
-	},
-	render() {
-		const currentDate = new Date();
-		const currentDay = currentDate.getDate();
-		const currentMonth = currentDate.getMonth();
-		const currentYear = currentDate.getFullYear();
-		const selectedDay = this.props.selectedDate ? this.props.selectedDate.getDate() : null;
-		const selectedMonth = this.props.selectedDate ? this.props.selectedDate.getMonth() : null;
-		const selectedYear = this.props.selectedDate ? this.props.selectedDate.getFullYear() : null;
-		const year = this.props.displayDate.getFullYear();
-		const month = this.props.displayDate.getMonth();
-		const firstDay = new Date(year, month, 1);
-		let startingDay = firstDay.getDay() - 1;
-		if(startingDay === -1) startingDay = 6;
-		let monthLength = daysInMonth[month];
-		if(month == 1) {
-			if((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
-				monthLength = 29;
-			}
-		}
-		const weeks = [];
-		let day = 1;
-		for(let i = 0; i < 9; i++) {
-			let week = [];
-			for(let j = 0; j <= 6; j++) {
-				if(day <= monthLength && (i > 0 || j >= startingDay)) {
-					const selected = day === selectedDay && month == selectedMonth && year === selectedYear;
-					const current = day === currentDay && month == currentMonth && year === currentYear;
-					week.push(
-						<td key={j} onClick={this.handleClick.bind(this, day)} className={"dp-calendar__day" + (selected ? " day--selected" : current ? " day-current" : "")}>{day}</td>);
-					day++;
-				}
-				else {
-					week.push(<td key={j}/>);
-				}
-			}
-			weeks.push(<tr key={i}>{week}</tr>);
-			if(day > monthLength) {
-				break;
-			}
-		}
-		return <table className="text-center dp-calendar">
-			<thead>
-			<tr>
-				{this.props.dayLabels.map((label, index)=> {
-					return <td key={index} className="text-muted">
-						<small>{label}</small>
-					</td>
-				})}
-			</tr>
-			</thead>
-			<tbody>
-			{weeks}
-			</tbody>
-		</table>;
-	}
-});
 
 export default React.createClass({
-	displayName: "DatePicker",
 	propTypes: {
 		value: React.PropTypes.string,
 		placeholder: React.PropTypes.string,
@@ -135,6 +37,7 @@ export default React.createClass({
 			calendarPlacement: "bottom",
 			dateFormat: 'DD.MM.YYYY',
 			showClearButton: true
+
 		}
 	},
 	getInitialState() {
@@ -143,6 +46,7 @@ export default React.createClass({
 		state.inputFocused = false;
 		state.placeholder = this.props.placeholder || this.props.dateFormat;
 		state.separator = this.props.dateFormat.match(/[^A-Z]/)[0];
+		state.view='days';
 		return state;
 	},
 	makeDateValues(isoString) {
@@ -172,7 +76,9 @@ export default React.createClass({
 			this.props.onClear();
 		}
 		else {
-			this.setState(this.makeDateValues(null));
+			let newState=this.makeDateValues(null);
+			newState.view='days';
+			this.setState(newState);
 		}
 
 		if(this.props.onChange) {
@@ -363,9 +269,16 @@ export default React.createClass({
 			inputValue: inputValue
 		});
 	},
-	onChangeMonth(newDisplayDate) {
-		this.setState({
+	onHeaderChange(newDisplayDate, view) {
+		let newState={
 			displayDate: newDisplayDate
+		};
+		if (view) newState.view=view;
+		this.setState(newState);
+	},
+	setView(view) {
+		this.setState({
+			view: view
 		});
 	},
 	onChangeDate(newSelectedDate) {
@@ -390,19 +303,56 @@ export default React.createClass({
 		}
 	},
 	render() {
-		const calendarHeader = <CalendarHeader
-			displayDate={this.state.displayDate}
-			onChange={this.onChangeMonth}
-			monthLabels={this.props.monthLabels}
-			dateFormat={this.props.dateFormat}/>;
-		return <InputGroup ref="inputGroup" bsClass={this.props.bsClass} bsSize={this.props.bsSize} id={this.props.id ? this.props.id + "_group" : null}>
+		let calendar=null; console.log(this.state.view);
+		switch (this.state.view) {
+			case 'days':
+				calendar=(
+					<CalendarDays
+						selectedDate={this.state.selectedDate}
+						displayDate={this.state.displayDate}
+						onChange={this.onChangeDate}
+						dayLabels={this.props.dayLabels}
+					/>
+				);
+				break;
+			case 'months':
+				calendar=(
+					<CalendarMonths
+						selectedDate={this.state.selectedDate}
+						displayDate={this.state.displayDate}
+						onChange={this.onHeaderChange}
+						monthLabels={this.props.monthLabels}
+					/>
+				);
+				break;
+			case 'years':
+				calendar=(
+					<CalendarYears
+						selectedDate={this.state.selectedDate}
+						displayDate={this.state.displayDate}
+						onChange={this.onHeaderChange}
+					/>
+				);
+				break;
+		}
+		return (
+			<div>
 			<Overlay rootClose={true} onHide={this.handleHide} show={this.state.focused} container={() => ReactDOM.findDOMNode(this.refs.overlayContainer)} target={() => ReactDOM.findDOMNode(this.refs.input)} placement={this.props.calendarPlacement} delayHide={200}>
-				<Popover id="calendar" title={calendarHeader}>
-					<Calendar selectedDate={this.state.selectedDate} displayDate={this.state.displayDate} onChange={this.onChangeDate} dayLabels={this.props.dayLabels}/>
+				<Popover id="calendar">
+					<CalendarHeader
+						displayDate={this.state.displayDate}
+						onChange={this.onHeaderChange}
+						setView={this.setView}
+						monthLabels={this.props.monthLabels}
+						dateFormat={this.props.dateFormat}
+						view={this.state.view}
+					/>
+					{calendar}
 					{this.props.showClearButton ?
 						<div>
 							<div onClick={this.clear} className="dp-clear-button">Очистить</div>
-						</div> : null}
+						</div> : null
+					}
 				</Popover>
 			</Overlay>
 			<div ref="overlayContainer"/>
@@ -418,6 +368,7 @@ export default React.createClass({
 				onChange={this.handleInputChange}
 			/>
 
-		</InputGroup>;
+		</div>
+		);
 	}
 });

@@ -9,6 +9,8 @@ $selected-color: #e0e0e0;
 }
 
 .dp-calendar {
+  width: 185px;
+  height: 190px;
   .dp-calendar__day {
 	padding: 5px;
 	@include button();
@@ -32,7 +34,10 @@ $selected-color: #e0e0e0;
 }
 
 .dp-header {
+  width: 100%;
+  margin-bottom: 5px;
   .dp-header--nav-button {
+	padding: 5px;
 	@include button();
   }
 }
