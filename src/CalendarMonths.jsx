@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 
 const CalendarMonths = React.createClass({
 	propTypes: {
@@ -17,7 +16,6 @@ const CalendarMonths = React.createClass({
 		const selectedMonth = this.props.selectedDate ? this.props.selectedDate.getMonth() : null;
 		const selectedYear = this.props.selectedDate ? this.props.selectedDate.getFullYear() : null;
 		const year = this.props.displayDate.getFullYear();
-		console.log(year,selectedYear);
 		let month = 0;
 
 		let rows=[];

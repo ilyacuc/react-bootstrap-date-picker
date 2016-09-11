@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 
 const CalendarYears = React.createClass({
 	propTypes: {
@@ -14,7 +13,6 @@ const CalendarYears = React.createClass({
 		this.props.onChange(newDisplayDate, 'months');
 	},
 	render() {
-		const selectedYear = this.props.selectedDate ? this.props.selectedDate.getFullYear() : null;
 		const displayYear = this.props.displayDate.getFullYear();
 		let year = displayYear-7;
 

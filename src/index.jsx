@@ -6,10 +6,10 @@ import ReactDOM from 'react-dom';
 import FormControl from 'react-bootstrap/lib/FormControl';
 import Popover from 'react-bootstrap/lib/Popover';
 import Overlay from 'react-bootstrap/lib/Overlay'
-import CalendarHeader from './CalendarHeader.jsx';
-import CalendarDays from './CalendarDays.jsx';
-import CalendarMonths from './CalendarMonths.jsx';
-import CalendarYears from './CalendarYears.jsx';
+import CalendarHeader from './CalendarHeader';
+import CalendarDays from './CalendarDays';
+import CalendarMonths from './CalendarMonths';
+import CalendarYears from './CalendarYears';
 
 
 
@@ -303,7 +303,7 @@ export default React.createClass({
 		}
 	},
 	render() {
-		let calendar=null; console.log(this.state.view);
+		let calendar=null;
 		switch (this.state.view) {
 			case 'days':
 				calendar=(
