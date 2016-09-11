@@ -338,7 +338,7 @@ export default React.createClass({
 				break;
 		}
 		return (
-			<div className={this.props.className}>
+			<div className={this.props.className} style={{position: 'relative'}}>
 			<Overlay rootClose={true} onHide={this.handleHide} show={this.state.focused} container={() => ReactDOM.findDOMNode(this.refs.overlayContainer)} target={() => ReactDOM.findDOMNode(this.refs.input)} placement={this.props.calendarPlacement} delayHide={200}>
 				<Popover id="calendar">
 					<CalendarHeader
