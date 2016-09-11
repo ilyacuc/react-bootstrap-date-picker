@@ -23,7 +23,8 @@ export default React.createClass({
 		onClear: React.PropTypes.func,
 		calendarPlacement: React.PropTypes.string,
 		dateFormat: React.PropTypes.string,  // 'MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY/MM/DD', 'DD-MM-YYYY'
-		showClearButton: React.PropTypes.bool
+		showClearButton: React.PropTypes.bool,
+		className: React.PropTypes.string
 	},
 	getDefaultProps() {
 		const language = typeof window !== "undefined" && window.navigator ? (window.navigator.userLanguage || window.navigator.language || '').toLowerCase() : '';
@@ -36,7 +37,8 @@ export default React.createClass({
 			],
 			calendarPlacement: "bottom",
 			dateFormat: 'DD.MM.YYYY',
-			showClearButton: true
+			showClearButton: true,
+			className: ''
 
 		}
 	},
@@ -336,7 +338,7 @@ export default React.createClass({
 				break;
 		}
 		return (
-			<div>
+			<div className={this.props.className}>
 			<Overlay rootClose={true} onHide={this.handleHide} show={this.state.focused} container={() => ReactDOM.findDOMNode(this.refs.overlayContainer)} target={() => ReactDOM.findDOMNode(this.refs.input)} placement={this.props.calendarPlacement} delayHide={200}>
 				<Popover id="calendar">
 					<CalendarHeader
